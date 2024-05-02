@@ -23,8 +23,10 @@ var (
 	memScrapePercentage        int
 	diskScrapePercentageStr    = os.Getenv("DISK_SCRAPE_PERCENTAGE")
 	diskScrapePercentage       int
-	javaMinimumMemoryStr       = os.Getenv("JAVA_MINIMUM_MB")
+	javaMinimumMemoryStr       = os.Getenv("JAVA_MINIMUM_MEM_MB")
 	javaMinimumMemory          int
+	minimumDiskStr             = os.Getenv("MINIMUM_DISK_MB")
+	minimumDisk                int
 	memUsageThresholdStr       = os.Getenv("MEM_USAGE_THRESHOLD_PERCENTAGE")
 	memUsageThreshold          int
 	diskUsageThresholdStr      = os.Getenv("DISK_USAGE_THRESHOLD_PERCENTAGE")
@@ -127,7 +129,15 @@ func environmentComplete() bool {
 		javaMinimumMemory = 768
 	} else {
 		if javaMinimumMemory, err = strconv.Atoi(javaMinimumMemoryStr); err != nil {
-			fmt.Printf("invalid value (%s) for JAVA_MINIMUM_MEMORY: %s", javaMinimumMemoryStr, err)
+			fmt.Printf("invalid value (%s) for JAVA_MINIMUM_MEM_MB: %s", javaMinimumMemoryStr, err)
+			envComplete = false
+		}
+	}
+	if minimumDiskStr == "" {
+		minimumDisk = 512
+	} else {
+		if minimumDisk, err = strconv.Atoi(minimumDiskStr); err != nil {
+			fmt.Printf("invalid value (%s) for MINIMUM_DISK_MB: %s", minimumDiskStr, err)
 			envComplete = false
 		}
 	}
@@ -151,7 +161,8 @@ func environmentComplete() bool {
 		fmt.Printf(" MEM_USAGE_THRESHOLD_PERCENTAGE: %d\n", memUsageThreshold)
 		fmt.Printf(" DISK_USAGE_THRESHOLD_PERCENTAGE: %d\n", diskUsageThreshold)
 		fmt.Printf(" LAST_UPDATED_AGE_THRESHOLD: %2.f\n", lastUpdatedAgeThreshold)
-		fmt.Printf(" JAVA_MINIMUM_MB: %d\n", javaMinimumMemory)
+		fmt.Printf(" JAVA_MINIMUM_MEM_MB: %d\n", javaMinimumMemory)
+		fmt.Printf(" MINIMUM_DISK_MB: %d\n", minimumDisk)
 		fmt.Printf(" EXCLUDED_ORGS: %s\n", excludedOrgs)
 		fmt.Printf(" EXCLUDED_SPACES: %s\n", excludedSpaces)
 		fmt.Printf(" DRY_RUN: %s\n\n", dryRun)
@@ -257,7 +268,7 @@ func main() {
 																	}
 																}
 															}
-															if usageDiskPercentMB < diskUsageThreshold && usageDiskMB > 1 && updatedAge > lastUpdatedAgeThreshold {
+															if usageDiskPercentMB < diskUsageThreshold && usageDiskMB > minimumDisk && updatedAge > lastUpdatedAgeThreshold {
 																isVictim = true
 																totalDiskVictims++
 																totalDiskAllocated = totalDiskAllocated + process.DiskInMB
