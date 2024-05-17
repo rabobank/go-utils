@@ -1,4 +1,4 @@
-### StatsNozzle
+### statsnozzlev1
 
 Listens on the firehose (V1) for events and counts them, by EventType, Origin, Job, Deployment and IP. Every 5 seconds it outputs the numbers to stdout.  
 You can optionally store the stats in an SQLite database.
