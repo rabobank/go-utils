@@ -1,0 +1,33 @@
+drop table if exists statsnozzle;
+create table statsnozzle
+(
+    id     integer   not null primary key,
+    route char(128) not null,
+    time   timestamp not null,
+    method char(6) not null,
+    path char(512) not null,
+    protocol char(6) not null,
+    response_code char(3) not null,
+    body_size integer not null,
+    response_size integer not null,
+    referrer char(512) not null,
+    user_agent char(256) not null,
+    remote_addr char(64) not null,
+    upstream_addr char(64) not null,
+    x_forwarded_for char(128) not null,
+    x_forwarded_proto char(8) not null,
+    vcap_request_id char(64) not null,
+    response_time integer not null,
+    gorouter_time integer not null,
+    app_id char(40) not null,
+    app_index char(3) not null,
+    instance_id char(40) not null,
+    x_cf_router_error char(64) not null,
+    x_rabo_client_ip char(64) not null,
+    x_session_id char(64) not null,
+    traceparent char(64) not null,
+    tracestate char(64) not null,
+    org_name char(64) not null,
+    space_name char(64) not null,
+    app_name char(64) not null
+);
