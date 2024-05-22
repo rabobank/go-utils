@@ -89,6 +89,7 @@ func main() {
 		for envelope := range bufferedEnvelopes {
 			payloadSlice := parseLogLine(string(envelope.GetLog().Payload))
 			if uriRegexp.MatchString(payloadSlice[0]) {
+				envelopeCount++
 				payloadSlice = append(payloadSlice, envelope.Tags["organization_name"], envelope.Tags["space_name"], envelope.Tags["app_name"])
 				if conf.PrintLogs {
 					log.Printf("%s - :    -  %v\n", time.Unix(0, envelope.Timestamp), payloadSlice)
@@ -119,7 +120,6 @@ func main() {
 		if envelopeCount < conf.MaxMessages {
 			for _, envelope := range envelopeStream() {
 				if envelope.Tags["source_type"] == "RTR" {
-					envelopeCount++
 					bufferedEnvelopes <- envelope
 					if envelopeCount >= conf.MaxMessages {
 						log.Printf("max envelopes reached: %d, inserted %d rows\n", conf.MaxMessages, insertCount)
