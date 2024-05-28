@@ -3,7 +3,7 @@ module github.com/rabobank/go-utils/statsnozzlev1
 go 1.22
 
 require (
-	github.com/cloudfoundry-community/go-cfclient/v3 v3.0.0-alpha.7
+	github.com/cloudfoundry-community/go-cfclient/v3 v3.0.0-alpha.6
 	github.com/cloudfoundry-incubator/uaago v0.0.0-20190307164349-8136b7bbe76e
 	github.com/cloudfoundry/noaa v2.1.0+incompatible
 	github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435
