@@ -1,8 +1,8 @@
 module github.com/rabobank/go-utils/appstopper
 
-go 1.22.1
+go 1.22
 
-require github.com/cloudfoundry-community/go-cfclient/v3 v3.0.0-alpha.6
+require github.com/cloudfoundry-community/go-cfclient/v3 v3.0.0-alpha.7
 
 require (
 	github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 // indirect
