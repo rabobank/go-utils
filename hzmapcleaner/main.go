@@ -80,7 +80,9 @@ func main() {
 					if err != nil {
 						fmt.Printf("failed to get map: %s\n", err)
 					} else {
-						if mapSize, err := mappie.Size(ctx); mapSize == 0 {
+						if mapSize, err := mappie.Size(ctx); err != nil {
+							fmt.Printf("failed to get map size: %s\n", err)
+						} else if mapSize == 0 {
 							findCount++
 							_, _ = fmt.Fprintf(os.Stderr, "%d - %s\n", findCount, mappie.Name())
 							if !dryRun {
