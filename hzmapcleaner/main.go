@@ -66,28 +66,34 @@ func main() {
 
 		var err error
 		var client *hazelcast.Client
+		var errCount int
 		if client, err = hazelcast.StartNewClientWithConfig(ctx, config); err != nil {
 			fmt.Printf("failed to start new client: %s\n", err)
+			errCount++
 		} else {
 			var distObjects []types.DistributedObjectInfo
 			var findCount, destroyCount int
 			if distObjects, err = client.GetDistributedObjectsInfo(ctx); err != nil {
 				fmt.Printf("failed to get distributed objects: %s\n", err)
+				errCount++
 			} else {
 				for _, distObject := range distObjects {
 					var mappie *hazelcast.Map
 					mappie, err = client.GetMap(ctx, distObject.Name)
 					if err != nil {
 						fmt.Printf("failed to get map: %s\n", err)
+						errCount++
 					} else {
 						if mapSize, err := mappie.Size(ctx); err != nil {
 							fmt.Printf("failed to get map size: %s\n", err)
+							errCount++
 						} else if mapSize == 0 {
 							findCount++
 							_, _ = fmt.Fprintf(os.Stderr, "%d - %s\n", findCount, mappie.Name())
 							if !dryRun {
 								if err = mappie.Destroy(ctx); err != nil {
 									fmt.Printf("      failed to destroy : %s\n", err)
+									errCount++
 								} else {
 									destroyCount++
 								}
@@ -98,6 +104,10 @@ func main() {
 				}
 				fmt.Printf("found %d distributed objects @ %s (%d destroyed)\n", len(distObjects), config.Cluster.Name, destroyCount)
 			}
+		}
+		if errCount > 0 {
+			fmt.Printf("encountered %d errors, exiting with non-zero exitcode\n", errCount)
+			os.Exit(1)
 		}
 		if err = client.Shutdown(ctx); err != nil {
 			fmt.Printf("failed to shutdown client: %s\n", err)
