@@ -2,7 +2,14 @@ module github.com/rabobank/go-utils/statsnozzlev2
 
 go 1.23
 
-replace golang.org/x/text => golang.org/x/text v0.19.0
+replace (
+	github.com/yuin/goldmark => github.com/yuin/goldmark v1.4.0
+	golang.org/x/crypto => golang.org/x/crypto v0.28.0
+	golang.org/x/net => golang.org/x/net v0.30.0
+	golang.org/x/text => golang.org/x/text v0.19.0
+	google.golang.org/protobuf => google.golang.org/protobuf v1.35.1
+	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.4.0
+)
 
 require (
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
