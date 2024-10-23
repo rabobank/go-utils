@@ -2,6 +2,8 @@ module github.com/rabobank/go-utils/appstopper
 
 go 1.23
 
+replace github.com/stretchr/testify => github.com/stretchr/testify v1.9.0
+
 require github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.9
 
 require (

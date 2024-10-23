@@ -9,7 +9,7 @@ replace (
 	golang.org/x/text => golang.org/x/text v0.19.0
 	google.golang.org/protobuf => google.golang.org/protobuf v1.35.1
 	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.4.0
-
+	github.com/onsi/ginkgo => github.com/onsi/ginkgo v1.16.5
 )
 
 require (
