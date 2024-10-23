@@ -1,8 +1,8 @@
 module github.com/rabobank/go-utils/appstopper
 
-go 1.22
+go 1.23
 
-require github.com/cloudfoundry-community/go-cfclient/v3 v3.0.0-alpha.6
+require github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.9
 
 require (
 	github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 // indirect
@@ -12,7 +12,6 @@ require (
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
-	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/oauth2 v0.20.0 // indirect
+	golang.org/x/oauth2 v0.23.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

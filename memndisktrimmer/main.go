@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/cloudfoundry-community/go-cfclient/v3/client"
-	"github.com/cloudfoundry-community/go-cfclient/v3/config"
-	"github.com/cloudfoundry-community/go-cfclient/v3/resource"
+	"github.com/cloudfoundry/go-cfclient/v3/client"
+	"github.com/cloudfoundry/go-cfclient/v3/config"
+	"github.com/cloudfoundry/go-cfclient/v3/resource"
 	"log"
 	"os"
 	"strconv"
@@ -172,10 +172,9 @@ func environmentComplete() bool {
 
 func getCFClient() (cfClient *client.Client) {
 	var err error
-	if cfConfig, err = config.NewClientSecret(apiAddress, cfUsername, cfPassword); err != nil {
+	if cfConfig, err = config.New(apiAddress, config.ClientCredentials(cfUsername, cfPassword), config.SkipTLSValidation()); err != nil {
 		log.Fatalf("failed to create new config: %s", err)
 	} else {
-		cfConfig.WithSkipTLSValidation(skipSSLValidation)
 		if cfClient, err = client.New(cfConfig); err != nil {
 			log.Fatalf("failed to create new client: %s", err)
 		} else {

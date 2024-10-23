@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/cloudfoundry-community/go-cfclient/v3/config"
 	"github.com/cloudfoundry-incubator/uaago"
 	"github.com/cloudfoundry/noaa/consumer"
 	"github.com/cloudfoundry/sonde-go/events"
@@ -29,7 +28,6 @@ var (
 	RTRForwarded = make(map[string]int)
 	RTRUserAgent = make(map[string]int)
 	RTRUri       = make(map[string]int)
-	cfConfig     *config.Config
 )
 
 type tokenRefresher struct {
@@ -42,16 +40,6 @@ func (t *tokenRefresher) RefreshAuthToken() (string, error) {
 		log.Fatalf("tokenRefresher failed : %s)", err)
 	}
 	return token, nil
-}
-
-func getCFConfig() {
-	var err error
-	if cfConfig, err = config.NewClientSecret(conf.ApiAddress, conf.CfUsername, conf.CfPassword); err != nil {
-		log.Fatalf("failed to create new config: %s", err)
-	} else {
-		cfConfig.WithSkipTLSValidation(true)
-	}
-	return
 }
 
 func printStatistics() {
@@ -86,7 +74,6 @@ func main() {
 	logErr := log.New(os.Stderr, "", 0)
 	logErr.SetOutput(os.Stderr)
 	logErr.SetPrefix("")
-	getCFConfig()
 	//
 	// start sucking the firehose and handle events
 	//
@@ -100,7 +87,11 @@ func main() {
 	}
 	refresher := tokenRefresher{uaaClient: uaa}
 	cons.RefreshTokenFrom(&refresher)
-	firehoseChan, errorChan := cons.Firehose("StatsNozzle", cfConfig.AccessToken)
+	uaaToken, err := uaa.GetAuthToken(conf.CfUsername, conf.CfPassword, true)
+	if err != nil {
+		log.Fatalf("failed to get uaa token: %s", err)
+	}
+	firehoseChan, errorChan := cons.Firehose("StatsNozzle", uaaToken)
 
 	go func() {
 		for err := range errorChan {
