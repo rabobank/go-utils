@@ -6,7 +6,6 @@ replace golang.org/x/text => golang.org/x/text v0.19.0
 
 require (
 	github.com/cloudfoundry-incubator/uaago v0.0.0-20190307164349-8136b7bbe76e
-	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.9
 	github.com/cloudfoundry/noaa v2.1.0+incompatible
 	github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435
 	github.com/mattn/go-sqlite3 v1.14.24
@@ -17,13 +16,11 @@ require (
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.34.2 // indirect
 	golang.org/x/net v0.30.0 // indirect
-	golang.org/x/oauth2 v0.23.0 // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
 )
