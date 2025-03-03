@@ -5,9 +5,9 @@ go 1.23
 replace (
 	github.com/onsi/ginkgo => github.com/onsi/ginkgo v1.16.5
 	github.com/yuin/goldmark => github.com/yuin/goldmark v1.7.8
-	golang.org/x/net => golang.org/x/net v0.33.0
-	golang.org/x/text => golang.org/x/text v0.21.0
-	google.golang.org/protobuf => google.golang.org/protobuf v1.36.0
+	golang.org/x/net => golang.org/x/net v0.35.0
+	golang.org/x/text => golang.org/x/text v0.22.0
+	google.golang.org/protobuf => google.golang.org/protobuf v1.36.5
 	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -20,11 +20,11 @@ require (
 
 require (
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
-	github.com/elazarl/goproxy v0.0.0-20241221210044-9faedc2f9e9f // indirect
-	github.com/elazarl/goproxy/ext v0.0.0-20241221210044-9faedc2f9e9f // indirect
+	github.com/elazarl/goproxy v1.7.2 // indirect
+	github.com/elazarl/goproxy/ext v0.0.0-20250225212552-ed2634328c83 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
-	github.com/onsi/gomega v1.36.1 // indirect
-	google.golang.org/protobuf v1.36.0 // indirect
+	github.com/onsi/gomega v1.36.2 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 )
