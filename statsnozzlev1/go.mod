@@ -1,10 +1,13 @@
 module github.com/rabobank/go-utils/statsnozzlev1
 
-go 1.23
+go 1.23.0
+
+toolchain go1.23.3
 
 replace (
 	github.com/onsi/ginkgo => github.com/onsi/ginkgo v1.16.5
 	github.com/yuin/goldmark => github.com/yuin/goldmark v1.7.8
+	golang.org/x/crypto => golang.org/x/crypto v0.35.0
 	golang.org/x/net => golang.org/x/net v0.35.0
 	golang.org/x/text => golang.org/x/text v0.22.0
 	google.golang.org/protobuf => google.golang.org/protobuf v1.36.5
