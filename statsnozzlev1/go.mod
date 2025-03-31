@@ -6,7 +6,7 @@ toolchain go1.23.3
 
 replace (
 	github.com/onsi/ginkgo => github.com/onsi/ginkgo v1.16.5
-	golang.org/x/net => golang.org/x/net v0.37.0
+	golang.org/x/net => golang.org/x/net v0.38.0
 	golang.org/x/text => golang.org/x/text v0.23.0
 	google.golang.org/protobuf => google.golang.org/protobuf v1.36.6
 )

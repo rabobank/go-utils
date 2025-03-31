@@ -7,7 +7,7 @@ toolchain go1.23.3
 replace (
 	github.com/onsi/ginkgo => github.com/onsi/ginkgo v1.16.5
 	golang.org/x/crypto => golang.org/x/crypto v0.36.0
-	golang.org/x/net => golang.org/x/net v0.37.0
+	golang.org/x/net => golang.org/x/net v0.38.0
 	golang.org/x/text => golang.org/x/text v0.23.0
 	google.golang.org/protobuf => google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.4.0
@@ -23,7 +23,7 @@ require (
 	code.cloudfoundry.org/go-diodes v0.0.0-20250324121313-75aea42a1fc3 // indirect
 	code.cloudfoundry.org/tlsconfig v0.22.0 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
-	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
