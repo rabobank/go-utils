@@ -1,23 +1,19 @@
 module github.com/rabobank/go-utils/statsnozzlev1
 
-go 1.23.0
-
-toolchain go1.23.3
+go 1.24
 
 replace (
 	github.com/onsi/ginkgo => github.com/onsi/ginkgo v1.16.5
-	github.com/yuin/goldmark => github.com/yuin/goldmark v1.4.0
-	golang.org/x/net => golang.org/x/net v0.38.0
-	golang.org/x/text => golang.org/x/text v0.23.0
+	golang.org/x/net => golang.org/x/net v0.40.0
+	golang.org/x/text => golang.org/x/text v0.25.0
 	google.golang.org/protobuf => google.golang.org/protobuf v1.36.6
-	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
 	github.com/cloudfoundry-incubator/uaago v0.0.0-20190307164349-8136b7bbe76e
 	github.com/cloudfoundry/noaa v2.1.0+incompatible
-	github.com/cloudfoundry/sonde-go v0.0.0-20241223073712-8666f251e654
-	github.com/mattn/go-sqlite3 v1.14.24
+	github.com/cloudfoundry/sonde-go v0.0.0-20250505082611-517434ece96d
+	github.com/mattn/go-sqlite3 v1.14.28
 )
 
 require (
@@ -28,6 +24,6 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
-	github.com/onsi/gomega v1.36.3 // indirect
+	github.com/onsi/gomega v1.37.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )
