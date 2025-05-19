@@ -4,9 +4,11 @@ go 1.24
 
 replace (
 	github.com/onsi/ginkgo => github.com/onsi/ginkgo v1.16.5
+	github.com/yuin/goldmark => github.com/yuin/goldmark v1.5.0
 	golang.org/x/net => golang.org/x/net v0.40.0
 	golang.org/x/text => golang.org/x/text v0.25.0
 	google.golang.org/protobuf => google.golang.org/protobuf v1.36.6
+	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
