@@ -91,10 +91,12 @@ func environmentComplete() bool {
 		excludedSpaces = strings.Split(excludedSpacesStr, ",")
 	}
 
-	if gracePeriod, err := strconv.Atoi(gracePeriodStr); err != nil {
-		log.Fatalf("failed to parse grace period: %s", err)
-	} else {
-		graceDate = time.Now().Add(-time.Hour * 24 * time.Duration(gracePeriod))
+	if runType == RunTypeStopOld || runType == RunTypeDeleteStopped || runType == RunTypeStopCrashing {
+		if gracePeriod, err := strconv.Atoi(gracePeriodStr); err != nil {
+			log.Fatalf("failed to parse grace period: %s", err)
+		} else {
+			graceDate = time.Now().Add(-time.Hour * 24 * time.Duration(gracePeriod))
+		}
 	}
 
 	if envComplete {
@@ -106,7 +108,9 @@ func environmentComplete() bool {
 		fmt.Printf(" EXCLUDED_SPACES: %s\n", excludedSpaces)
 		fmt.Printf(" DRY_RUN: %s\n", dryRun)
 		fmt.Printf(" RUN_TYPE: %s\n", runType)
-		fmt.Printf(" GRACE_PERIOD: %s\n\n", graceDate.Format(time.RFC3339))
+		if runType == RunTypeStopOld || runType == RunTypeDeleteStopped || runType == RunTypeStopCrashing {
+			fmt.Printf(" GRACE_PERIOD: %s\n\n", graceDate.Format(time.RFC3339))
+		}
 	}
 
 	cfClient = getCFClient()
