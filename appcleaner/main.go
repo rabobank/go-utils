@@ -25,12 +25,14 @@ var (
 	excludedOrgsStr      = os.Getenv("EXCLUDED_ORGS")
 	excludedOrgs         []string
 	excludedSpacesStr    = os.Getenv("EXCLUDED_SPACES")
-	gracePeriod          = os.Getenv("GRACE_PERIOD")
+	gracePeriodStr       = os.Getenv("GRACE_PERIOD")
+	graceDate            time.Time
 	excludedSpaces       []string
 	cfConfig             *config.Config
 	ctx                  = context.Background()
 	totalVictims         int
 	cfClient             *client.Client
+	cfContext            = context.TODO()
 )
 
 const (
@@ -40,6 +42,8 @@ const (
 	RunTypeStopCrashing   = "stopCrashing"
 	RunTypeStopOld        = "stopOld"
 	RunTypeDeleteStopped  = "deleteStopped"
+	ProcessStateDown      = "DOWN"
+	ProcessStateCrashed   = "CRASHED"
 )
 
 func environmentComplete() bool {
@@ -68,7 +72,7 @@ func environmentComplete() bool {
 	if runType == "" {
 		runType = RunTypeStopWeekly
 	} else if runType != RunTypeStopWeekly && runType != RunTypeStopDaily && runType != RunTypeDailyAndWeekly && runType != RunTypeStopCrashing && runType != RunTypeStopOld && runType != RunTypeDeleteStopped {
-		fmt.Printf("invalid value (%s) for RUN_TYPE, must be one of %s, %s, %s, %s, %s, %s, \n", runType, RunTypeStopDaily, RunTypeStopWeekly, RunTypeDailyAndWeekly, RunTypeStopCrashing, RunTypeStopOld, RunTypeDeleteStopped)
+		log.Printf("invalid value (%s) for RUN_TYPE, must be one of %s, %s, %s, %s, %s, %s, ", runType, RunTypeStopDaily, RunTypeStopWeekly, RunTypeDailyAndWeekly, RunTypeStopCrashing, RunTypeStopOld, RunTypeDeleteStopped)
 		envComplete = false
 	}
 
@@ -95,6 +99,13 @@ func environmentComplete() bool {
 		fmt.Printf(" EXCLUDED_SPACES: %s\n", excludedSpaces)
 		fmt.Printf(" DRY_RUN: %s\n", dryRun)
 		fmt.Printf(" RUN_TYPE: %s\n\n", runType)
+		fmt.Printf(" GRACE_PERIOD: %s\n\n", graceDate.Format(time.RFC3339))
+	}
+
+	if gracePeriod, err := strconv.Atoi(gracePeriodStr); err != nil {
+		log.Fatalf("failed to parse grace period: %s", err)
+	} else {
+		graceDate = time.Now().Add(-time.Hour * 24 * time.Duration(gracePeriod))
 	}
 
 	cfClient = getCFClient()
@@ -130,7 +141,7 @@ func main() {
 		os.Exit(8)
 	}
 	if orgs, err := cfClient.Organizations.ListAll(ctx, nil); err != nil {
-		fmt.Printf("failed to list orgs: %s", err)
+		log.Printf("failed to list orgs: %s", err)
 		os.Exit(1)
 	} else {
 		startTime := time.Now()
@@ -144,9 +155,22 @@ func main() {
 							if apps, _, err := cfClient.Applications.List(ctx, &client.AppListOptions{SpaceGUIDs: client.Filter{Values: []string{space.GUID}}}); err != nil {
 								log.Fatalf("failed to list all apps: %s", err)
 							} else {
-								for _, app := range apps {
-									if runType == RunTypeStopDaily || runType == RunTypeStopWeekly || runType == RunTypeDailyAndWeekly {
-										dailyOrWeeklyStop(org, space, *app)
+								if strings.Contains(strings.ToLower(cfConfig.ApiURL("")), ".cfp") {
+									log.Println("skip stopping old apps because this is a production environment")
+								} else {
+									for _, app := range apps {
+										if runType == RunTypeStopDaily || runType == RunTypeStopWeekly || runType == RunTypeDailyAndWeekly {
+											dailyOrWeeklyStop(org, space, *app)
+										}
+										if runType == RunTypeStopCrashing {
+											stopCrashing(org, space, *app)
+										}
+										if runType == RunTypeStopOld {
+											stopOld(org, space, *app)
+										}
+										if runType == RunTypeDeleteStopped {
+											deleteStopped(org, space, *app)
+										}
 									}
 								}
 							}
@@ -155,7 +179,7 @@ func main() {
 				}
 			}
 		}
-		fmt.Printf("\nexecutionTime: %.0f secs, total victims: %d\n", time.Now().Sub(startTime).Seconds(), totalVictims)
+		log.Printf("\nexecutionTime: %.0f secs, total victims: %d", time.Now().Sub(startTime).Seconds(), totalVictims)
 	}
 }
 
@@ -183,12 +207,74 @@ func dailyOrWeeklyStop(org *resource.Organization, space *resource.Space, app re
 		totalVictims++
 		if dryRun != "true" {
 			if _, err := cfClient.Applications.Stop(ctx, app.GUID); err != nil {
-				fmt.Printf("failed to stop app %s: %s\n", app.Name, err)
+				log.Printf("failed to stop app %s: %s", app.Name, err)
 			} else {
-				fmt.Printf("stopped  %s\n", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+				log.Printf("stopped  %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+				totalVictims++
 			}
 		} else {
-			fmt.Printf("(because of DRYRUN=true) not stopped  %s\n", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+			log.Printf("(because of DRYRUN=true) not stopped app %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+		}
+	}
+}
+
+func stopCrashing(org *resource.Organization, space *resource.Space, app resource.App) {
+	if app.State == "STARTED" {
+		if processStats, err := cfClient.Processes.GetStatsForApp(cfContext, app.GUID, "web"); err != nil {
+			log.Printf("failed to get process stats for app %s: %s", app.Name, err)
+		} else {
+			for _, processStat := range processStats.Stats {
+				if processStat.State == ProcessStateDown || processStat.State == ProcessStateCrashed {
+					if dryRun != "true" {
+						if stoppedApp, err := cfClient.Applications.Stop(cfContext, app.GUID); err != nil {
+							if stoppedApp != nil {
+								log.Printf("failed to stop app %s: %s", stoppedApp.Name, err)
+							}
+						} else {
+							log.Printf("stopped crashing app %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+							totalVictims++
+						}
+					} else {
+						log.Printf("(because of DRYRUN=true) not stopped crashing app %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+					}
+				}
+			}
+		}
+	}
+}
+
+func stopOld(org *resource.Organization, space *resource.Space, app resource.App) {
+	if app.State == "STARTED" {
+		if app.UpdatedAt.Before(graceDate) {
+			if dryRun != "true" {
+				_, err := cfClient.Applications.Stop(cfContext, app.GUID)
+				if err != nil {
+					log.Printf("failed to stop app %s: %s", app.Name, err)
+				} else {
+					log.Printf("stopped old app %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+					totalVictims++
+				}
+
+			} else {
+				log.Printf("(because of DRYRUN=true) not stopped old app %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+			}
+		}
+	}
+}
+
+func deleteStopped(org *resource.Organization, space *resource.Space, app resource.App) {
+	if app.State == "STOPPED" {
+		if app.UpdatedAt.Before(graceDate) {
+			if dryRun != "true" {
+				if _, err := cfClient.Applications.Delete(cfContext, app.GUID); err != nil {
+					log.Printf("failed to delete app %s: %s", app.Name, err)
+				} else {
+					log.Printf("deleted stopped app %s (last update: %s)", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name), app.UpdatedAt.Format(time.RFC3339))
+					totalVictims++
+				}
+			} else {
+				log.Printf("(because of DRYRUN=true) not deleted stopped app %s (last update: %s)", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name), app.UpdatedAt.Format(time.RFC3339))
+			}
 		}
 	}
 }
