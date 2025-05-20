@@ -12,6 +12,7 @@ A simple program that iterates over cf apps, and depending on the RUNTYPE will p
 * `SKIP_SSL_VALIDATION` - defaults to `false`.
 * `EXCLUDED_ORGS` - A comma separated list of orgs to exclude from the process, defaults to `system`.
 * `EXCLUDED_SPACES` - A comma separated list of spaces to exclude from the process, defaults to `""`.
+* `GRACE_PERIOD` - The number of days to wait (uses the app's updated_at field) before stopping/deleting an app. This environment variable is required.
 
 If you want an app to be excluded from the stop process, you can add the following labels to it:  
 
