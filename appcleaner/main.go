@@ -145,18 +145,18 @@ func main() {
 	if !environmentComplete() {
 		os.Exit(8)
 	}
-	if orgs, err := cfClient.Organizations.ListAll(ctx, nil); err != nil {
-		log.Printf("failed to list orgs: %s", err)
-		os.Exit(1)
+	if strings.Contains(strings.ToLower(cfConfig.ApiURL("")), ".cfp") && runType == RunTypeStopOld {
+		log.Println("skip stopping old apps because this is a production environment")
 	} else {
-		startTime := time.Now()
-		for _, org := range orgs {
-			if !orgNameExcluded(org.Name) {
-				if spaces, _, err := cfClient.Spaces.List(ctx, &client.SpaceListOptions{OrganizationGUIDs: client.Filter{Values: []string{org.GUID}}}); err != nil {
-					log.Fatalf("failed to list spaces: %s", err)
-				} else {
-					if strings.Contains(strings.ToLower(cfConfig.ApiURL("")), ".cfp") && runType == RunTypeStopOld {
-						log.Println("skip stopping old apps because this is a production environment")
+		if orgs, err := cfClient.Organizations.ListAll(ctx, nil); err != nil {
+			log.Printf("failed to list orgs: %s", err)
+			os.Exit(1)
+		} else {
+			startTime := time.Now()
+			for _, org := range orgs {
+				if !orgNameExcluded(org.Name) {
+					if spaces, _, err := cfClient.Spaces.List(ctx, &client.SpaceListOptions{OrganizationGUIDs: client.Filter{Values: []string{org.GUID}}}); err != nil {
+						log.Fatalf("failed to list spaces: %s", err)
 					} else {
 						for _, space := range spaces {
 							if !spaceNameExcluded(space.Name) {
@@ -183,8 +183,8 @@ func main() {
 					}
 				}
 			}
+			log.Printf("\nexecutionTime: %.0f secs, total victims: %d", time.Now().Sub(startTime).Seconds(), totalVictims)
 		}
-		log.Printf("\nexecutionTime: %.0f secs, total victims: %d", time.Now().Sub(startTime).Seconds(), totalVictims)
 	}
 }
 
