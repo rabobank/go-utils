@@ -155,13 +155,13 @@ func main() {
 				if spaces, _, err := cfClient.Spaces.List(ctx, &client.SpaceListOptions{OrganizationGUIDs: client.Filter{Values: []string{org.GUID}}}); err != nil {
 					log.Fatalf("failed to list spaces: %s", err)
 				} else {
-					for _, space := range spaces {
-						if !spaceNameExcluded(space.Name) {
-							if apps, _, err := cfClient.Applications.List(ctx, &client.AppListOptions{SpaceGUIDs: client.Filter{Values: []string{space.GUID}}}); err != nil {
-								log.Fatalf("failed to list all apps: %s", err)
-							} else {
-								if strings.Contains(strings.ToLower(cfConfig.ApiURL("")), ".cfp") {
-									log.Println("skip stopping old apps because this is a production environment")
+					if strings.Contains(strings.ToLower(cfConfig.ApiURL("")), ".cfp") {
+						log.Println("skip stopping old apps because this is a production environment")
+					} else {
+						for _, space := range spaces {
+							if !spaceNameExcluded(space.Name) {
+								if apps, _, err := cfClient.Applications.List(ctx, &client.AppListOptions{SpaceGUIDs: client.Filter{Values: []string{space.GUID}}}); err != nil {
+									log.Fatalf("failed to list all apps: %s", err)
 								} else {
 									for _, app := range apps {
 										if runType == RunTypeStopDaily || runType == RunTypeStopWeekly || runType == RunTypeDailyAndWeekly {
