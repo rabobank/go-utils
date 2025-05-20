@@ -155,7 +155,7 @@ func main() {
 				if spaces, _, err := cfClient.Spaces.List(ctx, &client.SpaceListOptions{OrganizationGUIDs: client.Filter{Values: []string{org.GUID}}}); err != nil {
 					log.Fatalf("failed to list spaces: %s", err)
 				} else {
-					if strings.Contains(strings.ToLower(cfConfig.ApiURL("")), ".cfp") {
+					if strings.Contains(strings.ToLower(cfConfig.ApiURL("")), ".cfp") && runType == RunTypeStopOld {
 						log.Println("skip stopping old apps because this is a production environment")
 					} else {
 						for _, space := range spaces {
