@@ -156,7 +156,7 @@ func main() {
 			log.Printf("failed to list orgs: %s", err)
 			os.Exit(1)
 		} else {
-			fmt.Printf("%-15s %-10s %-60s %-20s %-20s %-30s %-40s\n", "Offering name", "Plan Name", "Service Instance", "Updated At", "Last operation", "Org", "Space")
+			fmt.Printf("%-15s %-60s %-20s %-20s %-30s %-40s\n", "Offering name", "Service Instance", "Updated At", "Last operation", "Org", "Space")
 			for _, org := range orgs {
 				if !orgNameExcluded(org.Name) {
 					if spaces, _, err := cfClient.Spaces.List(ctx, &client.SpaceListOptions{OrganizationGUIDs: client.Filter{Values: []string{org.GUID}}}); err != nil {
@@ -185,7 +185,7 @@ func main() {
 																	log.Printf("failed to delete service instance %s: %s", serviceInstance.Name, err)
 																}
 															}
-															fmt.Printf("%-15s %-10s %-60s %-20s %-20s %-30s %-40s\n", offeringNameByGuid(servicePlan.Relationships.ServiceOffering.Data.GUID), servicePlan.Name, serviceInstance.Name, serviceInstance.UpdatedAt.Format(time.RFC3339), serviceInstance.LastOperation.UpdatedAt.Format(time.RFC3339), org.Name, space.Name)
+															fmt.Printf("%-15s %-60s %-20s %-20s %-30s %-40s\n", offeringNameByGuid(servicePlan.Relationships.ServiceOffering.Data.GUID), serviceInstance.Name, serviceInstance.UpdatedAt.Format(time.RFC3339), serviceInstance.LastOperation.UpdatedAt.Format(time.RFC3339), org.Name, space.Name)
 															totalVictims++
 														}
 													}
