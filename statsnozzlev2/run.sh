@@ -1,7 +1,7 @@
 # d06:
 export API_ADDR=https://api.sys.cfd06.rabobank.nl
-export CLIENT_ID=networkpolicycreator
-export CLIENT_SECRET=T1ttA2EOnspKWvmvPdtXzN8I7KBBqG
+export CLIENT_ID=<npc client-id>
+export CLIENT_SECRET=<npc-secret>
 
 export SHARD_ID=RLP-SHARD
 export STORE_IN_DB=true
