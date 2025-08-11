@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/cloudfoundry/go-cfclient/v3/client"
-	"github.com/cloudfoundry/go-cfclient/v3/config"
-	"github.com/cloudfoundry/go-cfclient/v3/resource"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/cloudfoundry/go-cfclient/v3/client"
+	"github.com/cloudfoundry/go-cfclient/v3/config"
+	"github.com/cloudfoundry/go-cfclient/v3/resource"
 )
 
 var (
@@ -77,7 +78,7 @@ func environmentComplete() bool {
 	}
 
 	if missingLabelAction == "" {
-		missingLabelAction = RunTypeStopDaily
+		missingLabelAction = strings.ToLower(RunTypeStopDaily)
 	}
 
 	if excludedOrgsStr == "" {
@@ -208,7 +209,8 @@ func spaceNameExcluded(spaceName string) bool {
 
 func dailyOrWeeklyStop(org *resource.Organization, space *resource.Space, app resource.App) {
 	autostopLabel := app.Metadata.Labels["AUTOSTOP"]
-	if app.State == "STARTED" && ((autostopLabel == nil && strings.Contains(runType, missingLabelAction)) || (autostopLabel != nil && strings.Contains(runType, *autostopLabel))) {
+	runType := strings.ToLower(runType)
+	if app.State == "STARTED" && ((autostopLabel == nil && strings.HasSuffix(runType, missingLabelAction)) || (autostopLabel != nil && strings.HasSuffix(runType, *autostopLabel))) {
 		totalVictims++
 		if dryRun != "true" {
 			if _, err := cfClient.Applications.Stop(ctx, app.GUID); err != nil {
