@@ -78,7 +78,7 @@ func environmentComplete() bool {
 	}
 
 	if missingLabelAction == "" {
-		missingLabelAction = strings.ToLower(RunTypeStopWeekly)
+		missingLabelAction = RunTypeStopWeekly
 	}
 
 	if excludedOrgsStr == "" {
@@ -109,6 +109,7 @@ func environmentComplete() bool {
 		fmt.Printf(" EXCLUDED_SPACES: %s\n", excludedSpaces)
 		fmt.Printf(" DRY_RUN: %s\n", dryRun)
 		fmt.Printf(" RUN_TYPE: %s\n", runType)
+		fmt.Printf(" MISSING_LABEL_ACTION: %s\n", missingLabelAction)
 		if runType == RunTypeStopOld || runType == RunTypeDeleteStopped || runType == RunTypeStopCrashing {
 			fmt.Printf(" GRACE_PERIOD: %s\n\n", graceDate.Format(time.RFC3339))
 		}
@@ -156,12 +157,12 @@ func main() {
 			startTime := time.Now()
 			for _, org := range orgs {
 				if !orgNameExcluded(org.Name) {
-					if spaces, _, err := cfClient.Spaces.List(ctx, &client.SpaceListOptions{OrganizationGUIDs: client.Filter{Values: []string{org.GUID}}}); err != nil {
+					if spaces, err := cfClient.Spaces.ListAll(ctx, &client.SpaceListOptions{ListOptions: &client.ListOptions{}, OrganizationGUIDs: client.Filter{Values: []string{org.GUID}}}); err != nil {
 						log.Fatalf("failed to list spaces: %s", err)
 					} else {
 						for _, space := range spaces {
 							if !spaceNameExcluded(space.Name) {
-								if apps, _, err := cfClient.Applications.List(ctx, &client.AppListOptions{SpaceGUIDs: client.Filter{Values: []string{space.GUID}}}); err != nil {
+								if apps, err := cfClient.Applications.ListAll(ctx, &client.AppListOptions{ListOptions: &client.ListOptions{}, SpaceGUIDs: client.Filter{Values: []string{space.GUID}}}); err != nil {
 									log.Fatalf("failed to list all apps: %s", err)
 								} else {
 									for _, app := range apps {
@@ -209,7 +210,7 @@ func spaceNameExcluded(spaceName string) bool {
 
 func dailyOrWeeklyStop(org *resource.Organization, space *resource.Space, app resource.App) {
 	autostopLabel := app.Metadata.Labels["AUTOSTOP"]
-	runType := strings.ToLower(runType)
+	//runType := strings.ToLower(runType)
 	if app.State == "STARTED" && ((autostopLabel == nil && strings.Contains(runType, missingLabelAction)) || (autostopLabel != nil && strings.HasSuffix(runType, strings.ToLower(*autostopLabel)))) {
 		if dryRun != "true" {
 			if _, err := cfClient.Applications.Stop(ctx, app.GUID); err != nil {
@@ -220,6 +221,14 @@ func dailyOrWeeklyStop(org *resource.Organization, space *resource.Space, app re
 			}
 		} else {
 			log.Printf("(because of DRYRUN=true) not stopped app %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+		}
+	} else {
+		if app.State != "STARTED" {
+			log.Printf("not stopping app %s because it is not started", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+		} else if autostopLabel == nil {
+			log.Printf("not stopping app %s because it has no AUTOSTOP label and missing label action is %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name), missingLabelAction)
+		} else {
+			log.Printf("not stopping app %s because its AUTOSTOP label is %s and run type is %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name), *autostopLabel, runType)
 		}
 	}
 }
