@@ -223,13 +223,13 @@ func dailyOrWeeklyStop(org *resource.Organization, space *resource.Space, app re
 			log.Printf("(because of DRYRUN=true) not stopped app %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
 		}
 	} else {
-		if app.State != "STARTED" {
-			log.Printf("not stopping app %s because it is not started", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
-		} else if autostopLabel == nil {
-			log.Printf("not stopping app %s because it has no AUTOSTOP label and missing label action is %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name), missingLabelAction)
-		} else {
-			log.Printf("not stopping app %s because its AUTOSTOP label is %s and run type is %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name), *autostopLabel, runType)
-		}
+		//if app.State != "STARTED" {
+		//	log.Printf("not stopping app %s because it is not started", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name))
+		//} else if autostopLabel == nil {
+		//	log.Printf("not stopping app %s because it has no AUTOSTOP label and missing label action is %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name), missingLabelAction)
+		//} else {
+		//	log.Printf("not stopping app %s because its AUTOSTOP label is %s and run type is %s", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name), *autostopLabel, runType)
+		//}
 	}
 }
 
