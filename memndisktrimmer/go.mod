@@ -2,7 +2,7 @@ module github.com/rabobank/go-utils/memndisktrimmer
 
 go 1.25
 
-replace github.com/stretchr/testify => github.com/stretchr/testify v1.10.0
+replace github.com/stretchr/testify => github.com/stretchr/testify v1.11.1
 
 require github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.15
 

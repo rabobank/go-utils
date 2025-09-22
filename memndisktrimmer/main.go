@@ -309,11 +309,9 @@ func main() {
 }
 
 func getBuildPackForApp(app *resource.App) string {
-	if len(app.Lifecycle.BuildpackData.Buildpacks) > 0 {
-		return app.Lifecycle.BuildpackData.Buildpacks[0]
-	}
 	if droplets, _, err := getCFClient().Droplets.List(ctx, &client.DropletListOptions{AppGUIDs: client.Filter{Values: []string{app.GUID}}}); err == nil {
 		if len(droplets) > 0 && droplets[0].Buildpacks != nil && len(droplets[0].Buildpacks) > 0 {
+			fmt.Printf(" found buildpack %s for app %s\n", droplets[0].Buildpacks[0].Name, app.Name)
 			return droplets[0].Buildpacks[0].Name
 		}
 	}
