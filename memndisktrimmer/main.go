@@ -287,7 +287,9 @@ func main() {
 																		fmt.Printf("\nfailed to restart app %s: %s\n", app.Name, err)
 																	} else {
 																		time.Sleep(3 * time.Second) // the docs say that the restart is synchronous, but to me it looks like it is not
-																		fmt.Printf("  ==>  %d MB Mem, ==> %d MB Disk", newProcess.MemoryInMB, newProcess.DiskInMB)
+																		if newProcess != nil {
+																			fmt.Printf("  ==>  %d MB Mem, ==> %d MB Disk", newProcess.MemoryInMB, newProcess.DiskInMB)
+																		}
 																	}
 																}
 															}
