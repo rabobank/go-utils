@@ -37,14 +37,18 @@ var (
 )
 
 const (
-	RunTypeStopDaily      = "stopDaily"
-	RunTypeStopWeekly     = "stopWeekly"
-	RunTypeDailyAndWeekly = "stopDaily,stopWeekly"
-	RunTypeStopCrashing   = "stopCrashing"
-	RunTypeStopOld        = "stopOld"
-	RunTypeDeleteStopped  = "deleteStopped"
-	ProcessStateDown      = "DOWN"
-	ProcessStateCrashed   = "CRASHED"
+	RunTypeStopDaily                        = "stopDaily"
+	RunTypeStopWeekly                       = "stopWeekly"
+	RunTypeDailyAndWeekly                   = "stopDaily,stopWeekly"
+	RunTypeStopCrashing                     = "stopCrashing"
+	RunTypeStopOld                          = "stopOld"
+	RunTypeDeleteStopped                    = "deleteStopped"
+	RuntypeRestartWeeklyOutsideOfficeHours  = "RESTART_WEEKLY_OUTSIDE_OFFICE_HOURS"
+	RuntypeRestartWeeklyOfficeHours         = "RESTART_WEEKLY_OFFICE_HOURS"
+	RuntypeRestartMonthlyOutsideOfficeHours = "RESTART_MONTHLY_OUTSIDE_OFFICE_HOURS"
+	RuntypeRestartMonthlyOfficeHours        = "RESTART_MONTHLY_OFFICE_HOURS"
+	ProcessStateDown                        = "DOWN"
+	ProcessStateCrashed                     = "CRASHED"
 )
 
 func environmentComplete() bool {
@@ -72,8 +76,8 @@ func environmentComplete() bool {
 	}
 	if runType == "" {
 		runType = RunTypeStopWeekly
-	} else if runType != RunTypeStopWeekly && runType != RunTypeStopDaily && runType != RunTypeDailyAndWeekly && runType != RunTypeStopCrashing && runType != RunTypeStopOld && runType != RunTypeDeleteStopped {
-		log.Printf("invalid value (%s) for RUN_TYPE, must be one of %s, %s, %s, %s, %s, %s, ", runType, RunTypeStopDaily, RunTypeStopWeekly, RunTypeDailyAndWeekly, RunTypeStopCrashing, RunTypeStopOld, RunTypeDeleteStopped)
+	} else if runType != RunTypeStopWeekly && runType != RunTypeStopDaily && runType != RunTypeDailyAndWeekly && runType != RunTypeStopCrashing && runType != RunTypeStopOld && runType != RunTypeDeleteStopped && runType != RuntypeRestartWeeklyOfficeHours && runType != RuntypeRestartWeeklyOutsideOfficeHours && runType != RuntypeRestartMonthlyOfficeHours && runType != RuntypeRestartMonthlyOutsideOfficeHours {
+		log.Printf("invalid value (%s) for RUN_TYPE, must be one of %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ", runType, RunTypeStopDaily, RunTypeStopWeekly, RunTypeDailyAndWeekly, RunTypeStopCrashing, RunTypeStopOld, RunTypeDeleteStopped, RuntypeRestartWeeklyOfficeHours, RuntypeRestartWeeklyOutsideOfficeHours, RuntypeRestartMonthlyOfficeHours, RuntypeRestartMonthlyOutsideOfficeHours)
 		envComplete = false
 	}
 
@@ -150,33 +154,37 @@ func main() {
 	if strings.Contains(strings.ToLower(cfConfig.ApiURL("")), ".cfp") && runType == RunTypeStopOld {
 		log.Println("skip stopping old apps because this is a production environment")
 	} else {
-		if orgs, err := cfClient.Organizations.ListAll(ctx, nil); err != nil {
-			log.Printf("failed to list orgs: %s", err)
-			os.Exit(1)
+		startTime := time.Now()
+		if runType == RuntypeRestartWeeklyOfficeHours || runType == RuntypeRestartWeeklyOutsideOfficeHours || runType == RuntypeRestartMonthlyOfficeHours || runType == RuntypeRestartMonthlyOutsideOfficeHours {
+			restartApps()
 		} else {
-			startTime := time.Now()
-			for _, org := range orgs {
-				if !orgNameExcluded(org.Name) {
-					if spaces, err := cfClient.Spaces.ListAll(ctx, &client.SpaceListOptions{ListOptions: &client.ListOptions{}, OrganizationGUIDs: client.Filter{Values: []string{org.GUID}}}); err != nil {
-						log.Fatalf("failed to list spaces: %s", err)
-					} else {
-						for _, space := range spaces {
-							if !spaceNameExcluded(space.Name) {
-								if apps, err := cfClient.Applications.ListAll(ctx, &client.AppListOptions{ListOptions: &client.ListOptions{}, SpaceGUIDs: client.Filter{Values: []string{space.GUID}}}); err != nil {
-									log.Fatalf("failed to list all apps: %s", err)
-								} else {
-									for _, app := range apps {
-										if runType == RunTypeStopDaily || runType == RunTypeStopWeekly || runType == RunTypeDailyAndWeekly {
-											dailyOrWeeklyStop(org, space, *app)
-										}
-										if runType == RunTypeStopCrashing {
-											stopCrashing(org, space, *app)
-										}
-										if runType == RunTypeStopOld {
-											stopOld(org, space, *app)
-										}
-										if runType == RunTypeDeleteStopped {
-											deleteStopped(org, space, *app)
+			if orgs, err := cfClient.Organizations.ListAll(ctx, nil); err != nil {
+				log.Printf("failed to list orgs: %s", err)
+				os.Exit(1)
+			} else {
+				for _, org := range orgs {
+					if !orgNameExcluded(org.Name) {
+						if spaces, err := cfClient.Spaces.ListAll(ctx, &client.SpaceListOptions{ListOptions: &client.ListOptions{}, OrganizationGUIDs: client.Filter{Values: []string{org.GUID}}}); err != nil {
+							log.Fatalf("failed to list spaces: %s", err)
+						} else {
+							for _, space := range spaces {
+								if !spaceNameExcluded(space.Name) {
+									if apps, err := cfClient.Applications.ListAll(ctx, &client.AppListOptions{ListOptions: &client.ListOptions{}, SpaceGUIDs: client.Filter{Values: []string{space.GUID}}}); err != nil {
+										log.Fatalf("failed to list all apps: %s", err)
+									} else {
+										for _, app := range apps {
+											if runType == RunTypeStopDaily || runType == RunTypeStopWeekly || runType == RunTypeDailyAndWeekly {
+												dailyOrWeeklyStop(org, space, *app)
+											}
+											if runType == RunTypeStopCrashing {
+												stopCrashing(org, space, *app)
+											}
+											if runType == RunTypeStopOld {
+												stopOld(org, space, *app)
+											}
+											if runType == RunTypeDeleteStopped {
+												deleteStopped(org, space, *app)
+											}
 										}
 									}
 								}
@@ -289,6 +297,42 @@ func deleteStopped(org *resource.Organization, space *resource.Space, app resour
 				}
 			} else {
 				log.Printf("(because of DRYRUN=true) not deleted stopped app %s (last update: %s)", fmt.Sprintf("%s/%s/%s", org.Name, space.Name, app.Name), app.UpdatedAt.Format(time.RFC3339))
+			}
+		}
+	}
+}
+
+func restartApps() {
+	labelSelector := make(client.LabelSelector)
+	if runType == RuntypeRestartWeeklyOfficeHours {
+		labelSelector.Existence(RuntypeRestartWeeklyOfficeHours)
+	}
+	if runType == RuntypeRestartWeeklyOutsideOfficeHours {
+		labelSelector.Existence(RuntypeRestartWeeklyOutsideOfficeHours)
+	}
+	if runType == RuntypeRestartMonthlyOfficeHours {
+		labelSelector.Existence(RuntypeRestartMonthlyOfficeHours)
+	}
+	if runType == RuntypeRestartMonthlyOutsideOfficeHours {
+		labelSelector.Existence(RuntypeRestartMonthlyOutsideOfficeHours)
+	}
+
+	if apps, err := cfClient.Applications.ListAll(ctx, &client.AppListOptions{ListOptions: &client.ListOptions{LabelSel: labelSelector}}); err != nil {
+		log.Fatalf("failed to list all apps for selector %v: %s", labelSelector, err)
+	} else {
+		for _, app := range apps {
+			if app.State == "STARTED" {
+				if dryRun != "true" {
+					_, err = cfClient.Applications.Restart(cfContext, app.GUID)
+					if err != nil {
+						log.Printf("failed to restart app %s: %s", app.Name, err)
+					} else {
+						log.Printf("restarted app %s", fmt.Sprintf("%s", app.Name))
+						totalVictims++
+					}
+				} else {
+					log.Printf("(because of DRYRUN=true) not restarted app %s", fmt.Sprintf("%s", app.Name))
+				}
 			}
 		}
 	}
