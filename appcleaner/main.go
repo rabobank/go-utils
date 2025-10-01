@@ -43,10 +43,10 @@ const (
 	RunTypeStopCrashing                     = "stopCrashing"
 	RunTypeStopOld                          = "stopOld"
 	RunTypeDeleteStopped                    = "deleteStopped"
-	RuntypeRestartWeeklyOutsideOfficeHours  = "RESTART_WEEKLY_OUTSIDE_OFFICE_HOURS"
-	RuntypeRestartWeeklyOfficeHours         = "RESTART_WEEKLY_OFFICE_HOURS"
-	RuntypeRestartMonthlyOutsideOfficeHours = "RESTART_MONTHLY_OUTSIDE_OFFICE_HOURS"
-	RuntypeRestartMonthlyOfficeHours        = "RESTART_MONTHLY_OFFICE_HOURS"
+	RuntypeRestartWeeklyOutsideOfficeHours  = "RestartweeklyOutsideOfficeHours"
+	RuntypeRestartWeeklyOfficeHours         = "RestartweeklyOfficeHours"
+	RuntypeRestartMonthlyOutsideOfficeHours = "RestartmonthlyOutsideOfficeHours"
+	RuntypeRestartMonthlyOfficeHours        = "RestartmonthlyOfficeHours"
 	ProcessStateDown                        = "DOWN"
 	ProcessStateCrashed                     = "CRASHED"
 )
@@ -305,18 +305,32 @@ func deleteStopped(org *resource.Organization, space *resource.Space, app resour
 func restartApps() {
 	labelSelector := make(client.LabelSelector)
 	if runType == RuntypeRestartWeeklyOfficeHours {
-		labelSelector.Existence(RuntypeRestartWeeklyOfficeHours)
+		labelSelector.EqualTo("RESTART", strings.Split(RuntypeRestartWeeklyOfficeHours, "Restart")[1])
 	}
 	if runType == RuntypeRestartWeeklyOutsideOfficeHours {
-		labelSelector.Existence(RuntypeRestartWeeklyOutsideOfficeHours)
+		labelSelector.EqualTo("RESTART", strings.Split(RuntypeRestartWeeklyOutsideOfficeHours, "Restart")[1])
 	}
+	today := time.Now()
 	if runType == RuntypeRestartMonthlyOfficeHours {
-		labelSelector.Existence(RuntypeRestartMonthlyOfficeHours)
+		// check if this x day (SunDay, Thursday...) is the first X day of the month
+		fmt.Printf("DEBUG: today is the %d %s\n", today.Day(), today.Weekday().String())
+		if today.Day() > 7 {
+			fmt.Printf("today is the %d, so not the first %s of the month, exiting\n", today.Day(), today.Weekday().String())
+			return
+		}
+		labelSelector.EqualTo("RESTART", strings.Split(RuntypeRestartMonthlyOfficeHours, "Restart")[1])
 	}
 	if runType == RuntypeRestartMonthlyOutsideOfficeHours {
-		labelSelector.Existence(RuntypeRestartMonthlyOutsideOfficeHours)
+		// check if this x day (SunDay, Thursday...) is the first X day of the month
+		fmt.Printf("DEBUG: today is the %d %s\n", today.Day(), today.Weekday().String())
+		if today.Day() > 7 {
+			fmt.Printf("today is the %d, so not the first %s of the month, exiting\n", today.Day(), today.Weekday().String())
+			return
+		}
+		labelSelector.EqualTo("RESTART", strings.Split(RuntypeRestartMonthlyOutsideOfficeHours, "Restart")[1])
 	}
 
+	fmt.Printf("DEBUG: using label selector %v\n", labelSelector)
 	if apps, err := cfClient.Applications.ListAll(ctx, &client.AppListOptions{ListOptions: &client.ListOptions{LabelSel: labelSelector}}); err != nil {
 		log.Fatalf("failed to list all apps for selector %v: %s", labelSelector, err)
 	} else {
