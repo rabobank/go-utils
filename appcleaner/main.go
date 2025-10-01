@@ -305,10 +305,10 @@ func deleteStopped(org *resource.Organization, space *resource.Space, app resour
 func restartApps() {
 	labelSelector := make(client.LabelSelector)
 	if runType == RuntypeRestartWeeklyOfficeHours {
-		labelSelector.EqualTo("RESTART", strings.Split(RuntypeRestartWeeklyOfficeHours, "Restart")[1])
+		labelSelector.EqualTo("AUTORESTART", strings.Split(RuntypeRestartWeeklyOfficeHours, "Restart")[1])
 	}
 	if runType == RuntypeRestartWeeklyOutsideOfficeHours {
-		labelSelector.EqualTo("RESTART", strings.Split(RuntypeRestartWeeklyOutsideOfficeHours, "Restart")[1])
+		labelSelector.EqualTo("AUTORESTART", strings.Split(RuntypeRestartWeeklyOutsideOfficeHours, "Restart")[1])
 	}
 	today := time.Now()
 	if runType == RuntypeRestartMonthlyOfficeHours {
@@ -318,7 +318,7 @@ func restartApps() {
 			fmt.Printf("today is the %d, so not the first %s of the month, exiting\n", today.Day(), today.Weekday().String())
 			return
 		}
-		labelSelector.EqualTo("RESTART", strings.Split(RuntypeRestartMonthlyOfficeHours, "Restart")[1])
+		labelSelector.EqualTo("AUTORESTART", strings.Split(RuntypeRestartMonthlyOfficeHours, "Restart")[1])
 	}
 	if runType == RuntypeRestartMonthlyOutsideOfficeHours {
 		// check if this x day (SunDay, Thursday...) is the first X day of the month
@@ -327,7 +327,7 @@ func restartApps() {
 			fmt.Printf("today is the %d, so not the first %s of the month, exiting\n", today.Day(), today.Weekday().String())
 			return
 		}
-		labelSelector.EqualTo("RESTART", strings.Split(RuntypeRestartMonthlyOutsideOfficeHours, "Restart")[1])
+		labelSelector.EqualTo("AUTORESTART", strings.Split(RuntypeRestartMonthlyOutsideOfficeHours, "Restart")[1])
 	}
 
 	fmt.Printf("DEBUG: using label selector %v\n", labelSelector)
