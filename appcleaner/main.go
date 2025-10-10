@@ -337,7 +337,8 @@ func restartApps() {
 		for _, app := range apps {
 			if app.State == "STARTED" {
 				if dryRun != "true" {
-					_, err = cfClient.Applications.Restart(cfContext, app.GUID)
+					//_, err = cfClient.Applications.Restart(cfContext, app.GUID)
+					_, err = cfClient.Deployments.Create(cfContext, &resource.DeploymentCreate{Relationships: resource.AppRelationship{App: resource.ToOneRelationship{Data: &resource.Relationship{GUID: app.GUID}}}})
 					if err != nil {
 						log.Printf("failed to restart app %s: %s", app.Name, err)
 					} else {
