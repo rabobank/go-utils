@@ -342,7 +342,7 @@ func restartApps() {
 					if err != nil {
 						log.Printf("failed to restart app %s: %s", app.Name, err)
 					} else {
-						log.Printf("restarted app %s", fmt.Sprintf("%s", app.Name))
+						log.Printf("rolling restart initiated for app %s", fmt.Sprintf("%s", app.Name))
 						totalVictims++
 					}
 				} else {
