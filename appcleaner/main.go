@@ -313,7 +313,6 @@ func restartApps() {
 	today := time.Now()
 	if runType == RuntypeRestartMonthlyOfficeHours {
 		// check if this x day (SunDay, Thursday...) is the first X day of the month
-		fmt.Printf("DEBUG: today is the %d %s\n", today.Day(), today.Weekday().String())
 		if today.Day() > 7 {
 			fmt.Printf("today is the %d, so not the first %s of the month, exiting\n", today.Day(), today.Weekday().String())
 			return
@@ -322,7 +321,6 @@ func restartApps() {
 	}
 	if runType == RuntypeRestartMonthlyOutsideOfficeHours {
 		// check if this x day (SunDay, Thursday...) is the first X day of the month
-		fmt.Printf("DEBUG: today is the %d %s\n", today.Day(), today.Weekday().String())
 		if today.Day() > 7 {
 			fmt.Printf("today is the %d, so not the first %s of the month, exiting\n", today.Day(), today.Weekday().String())
 			return
@@ -330,7 +328,6 @@ func restartApps() {
 		labelSelector.EqualTo("AUTORESTART", strings.Split(RuntypeRestartMonthlyOutsideOfficeHours, "Restart")[1])
 	}
 
-	fmt.Printf("DEBUG: using label selector %v\n", labelSelector)
 	if apps, err := cfClient.Applications.ListAll(ctx, &client.AppListOptions{ListOptions: &client.ListOptions{LabelSel: labelSelector}}); err != nil {
 		log.Fatalf("failed to list all apps for selector %v: %s", labelSelector, err)
 	} else {
