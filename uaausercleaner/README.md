@@ -10,3 +10,4 @@ A simple program that will show uaa users that have a createdTime and lastLogonT
 * `SKIP_SSL_VALIDATION` - defaults to `false`.
 * `CREATED_DAYS_AGO` - Number of days ago the user was created before it will pass the filter, defaults to 400.
 * `LASTLOGON_DAYS_AGO` - Number of days ago the user was last logged in before it will pass the filter, defaults to 400.
+* `DELETE_USERS` - If set to `true`, the users that match the filter will be deleted. Defaults to `false`.
