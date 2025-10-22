@@ -27,10 +27,10 @@ type SpaceConfig struct {
 }
 
 type AlertMail struct {
-	To      string
-	Cc      string
-	Subject string
-	Body    string
+	to      string
+	cc      string
+	subject string
+	message string
 }
 
 var (
