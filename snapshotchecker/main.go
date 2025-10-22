@@ -27,10 +27,10 @@ type SpaceConfig struct {
 }
 
 type AlertMail struct {
-	To      string `yaml:"to"`
-	Cc      string `yaml:"cc"`
-	Subject string `yaml:"subject"`
-	Message string `yaml:"message"`
+	To      string `json:"to"`
+	Cc      string `json:"cc"`
+	Subject string `json:"subject"`
+	Message string `json:"message"`
 }
 
 var (
