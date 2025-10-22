@@ -27,10 +27,10 @@ type SpaceConfig struct {
 }
 
 type AlertMail struct {
-	to      string
-	cc      string
-	subject string
-	message string
+	To      string `yaml:"to"`
+	Cc      string `yaml:"cc"`
+	Subject string `yaml:"subject"`
+	Message string `yaml:"message"`
 }
 
 var (
@@ -115,7 +115,7 @@ func createAlert(dbInstance types.DBInstance) {
 		subject := fmt.Sprintf("RDS Snapshot alert for org: %s, space: %s, DB: %s, Service Instance: %s", org, space, *dbInstance.DBInstanceIdentifier, serviceInstance)
 		body := fmt.Sprintf("The most recent snapshot for RDS instance %s (org: %s, space: %s, service instance: %s) is older than %d days.\n", *dbInstance.DBInstanceIdentifier, org, space, serviceInstance, thresholdDays)
 		body += fmt.Sprintf("Contact team Panzer for more details.\n")
-		alertMail := AlertMail{to: mailCC, cc: mailCC, subject: subject, message: body}
+		alertMail := AlertMail{To: mailCC, Cc: mailCC, Subject: subject, Message: body}
 		alertMails = append(alertMails, alertMail)
 	} else {
 		fmt.Printf("  No spaceConfig.yml found for org: %s, space: %s\n", org, space)
