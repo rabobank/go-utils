@@ -83,7 +83,9 @@ func main() {
 			if err != nil {
 				log.Printf("failed to format alert mail: %s", err)
 			}
-			fmt.Println(string(ba))
+			if ba != nil && len(ba) > 0 {
+				fmt.Println(string(ba))
+			}
 			log.Printf("Total DB Instances checked: %d, total snapshots checked: %d\n", totalDBInstances, totalSnapshots)
 		}
 	}
@@ -112,7 +114,7 @@ func createAlert(dbInstance types.DBInstance) {
 		subject := fmt.Sprintf("RDS Snapshot alert for org: %s, space: %s, DB: %s, Service Instance: %s", org, space, *dbInstance.DBInstanceIdentifier, serviceInstance)
 		body := fmt.Sprintf("The most recent snapshot for RDS instance %s (org: %s, space: %s, service instance: %s) is older than %d days.\n", *dbInstance.DBInstanceIdentifier, org, space, serviceInstance, thresholdDays)
 		body += fmt.Sprintf("Contact team Panzer for more details.\n")
-		alertMail := AlertMail{To: spaceConfig.Metadata.Contact, Cc: mailCC, Subject: subject, Body: body}
+		alertMail := AlertMail{To: mailCC, Cc: mailCC, Subject: subject, Body: body}
 		alertMails = append(alertMails, alertMail)
 	} else {
 		fmt.Printf("  No spaceConfig.yml found for org: %s, space: %s\n", org, space)
