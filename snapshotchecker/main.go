@@ -82,9 +82,10 @@ func main() {
 			ba, err := json.MarshalIndent(alertMails, "", "  ")
 			if err != nil {
 				log.Printf("failed to format alert mail: %s", err)
-			}
-			if ba != nil && len(ba) > 0 {
-				fmt.Println(string(ba))
+			} else {
+				if ba != nil && string(ba) != "null" {
+					fmt.Println(string(ba))
+				}
 			}
 			log.Printf("Total DB Instances checked: %d, total snapshots checked: %d\n", totalDBInstances, totalSnapshots)
 		}
