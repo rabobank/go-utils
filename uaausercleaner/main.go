@@ -17,7 +17,7 @@ var (
 	deleteUsersStr       = os.Getenv("DELETE_USERS")
 	createdDaysAgoStr    = os.Getenv("CREATED_DAYS_AGO")
 	createdDaysAgo       int
-	lastLogonDaysAgoStr  = os.Getenv("LASTLOGON_DAYS_AGO")
+	lastLogonDaysAgoStr  = os.Getenv("LAST_LOGON_DAYS_AGO")
 	lastLogonDaysAgo     int
 	skipSSLValidation    bool
 	deleteUsers          bool
@@ -61,7 +61,7 @@ func environmentComplete() bool {
 		lastLogonDaysAgo = 400
 	} else {
 		if lastLogonDaysAgo, err = strconv.Atoi(lastLogonDaysAgoStr); err != nil {
-			fmt.Printf("invalid value (%s) for LASTLOGON_DAYS_AGO: %s", lastLogonDaysAgoStr, err)
+			fmt.Printf("invalid value (%s) for LAST_LOGON_DAYS_AGO: %s", lastLogonDaysAgoStr, err)
 			envComplete = false
 		}
 	}
@@ -79,7 +79,7 @@ func environmentComplete() bool {
 		fmt.Printf(" UAA_CLIENTID: %s\n", uaaClientId)
 		fmt.Printf(" SKIP_SSL_VALIDATION: %t\n", skipSSLValidation)
 		fmt.Printf(" CREATED_DAYS_AGO: %d\n", createdDaysAgo)
-		fmt.Printf(" LASTLOGON_DAYS_AGO: %d\n", lastLogonDaysAgo)
+		fmt.Printf(" LAST_LOGON_DAYS_AGO: %s\n", lastLogonDaysAgoStr)
 		fmt.Printf(" DELETE_USERS: %t\n", deleteUsers)
 	}
 	return envComplete
@@ -91,19 +91,24 @@ func main() {
 	}
 	log.SetOutput(os.Stdout)
 	if err := initializeUaa(); err != nil {
-		fmt.Printf("Failed to initialize UAA: %s\n", err)
+		fmt.Printf("failed to initialize UAA: %s\n", err)
 		os.Exit(8)
 	}
 	log.Printf("UAA initialized, getting users...")
 	pageSize := 250
 	startIndex := 0
 	eligibleUsers := 0
+	totalUsers := 0
+	deletedUsers := 0
 	for {
-		if users, page, err := api.ListUsers("", "", "", "", startIndex, pageSize); err != nil {
-			log.Printf("Failed to list users: %s\n", err)
+		if users, page, err := api.ListUsers("", "", "", "", startIndex-deletedUsers, pageSize); err != nil {
+			log.Printf("failed to list users: %s\n", err)
 			//os.Exit(8)
 		} else {
 			//log.Printf("Total %d (startIndex %d)\n", page.TotalResults, page.StartIndex)
+			if startIndex == 0 {
+				totalUsers = page.TotalResults
+			}
 			startIndex += page.ItemsPerPage
 			if startIndex > page.TotalResults {
 				break
@@ -111,17 +116,18 @@ func main() {
 			var createdTime time.Time
 			for _, user := range users {
 				if createdTime, err = time.Parse(magicCreatedTime, user.Meta.Created); err != nil {
-					log.Printf("Failed to parse created time: %s\n", err)
+					log.Printf("failed to parse created time: %s\n", err)
 				} else {
 					lastLogonTime := time.Unix(int64(user.LastLogonTime/1000), 0)
 					if time.Since(createdTime).Hours() > float64(createdDaysAgo*24) && time.Since(lastLogonTime).Hours() > float64(lastLogonDaysAgo*24) {
-						log.Printf("created: %s, lastLogonTime: %s, ID: %s origin: %s, User: %s\n", createdTime.Format(time.RFC3339), lastLogonTime.Format(time.RFC3339), user.ID, user.Origin, user.Username)
+						log.Printf("creationTime: %s, lastLogonTime: %s, ID: %s origin: %s, User: %s\n", createdTime.Format(time.RFC3339), lastLogonTime.Format(time.RFC3339), user.ID, user.Origin, user.Username)
 						eligibleUsers++
 						if deleteUsers {
 							if deletedUser, err := api.DeleteUser(user.ID); err != nil {
-								log.Printf("Failed to delete user (%s) %s: %s\n", user.ID, user.Username, err)
+								log.Printf("failed to delete user (%s) %s: %s\n", user.ID, user.Username, err)
 							} else {
-								log.Printf("Deleted user (%s) %s\n", deletedUser.ID, deletedUser.Username)
+								log.Printf("deleted user (%s) %s\n", deletedUser.ID, deletedUser.Username)
+								deletedUsers++
 							}
 						}
 					}
@@ -129,7 +135,7 @@ func main() {
 			}
 		}
 	}
-	log.Printf("EligibleUsers: %d\n", eligibleUsers)
+	log.Printf("eligible users: %d (out of %d), deleted users: %d\n", eligibleUsers, totalUsers, deletedUsers)
 }
 
 func initializeUaa() error {
