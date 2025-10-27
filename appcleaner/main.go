@@ -219,7 +219,7 @@ func spaceNameExcluded(spaceName string) bool {
 func dailyOrWeeklyStop(org *resource.Organization, space *resource.Space, app resource.App) {
 	autostopLabel := app.Metadata.Labels["AUTOSTOP"]
 	//runType := strings.ToLower(runType)
-	if app.State == "STARTED" && ((autostopLabel == nil && strings.Contains(runType, missingLabelAction)) || (autostopLabel != nil && strings.HasSuffix(runType, strings.ToLower(*autostopLabel)))) {
+	if app.State == "STARTED" && ((autostopLabel == nil && strings.Contains(runType, missingLabelAction)) || (autostopLabel != nil && strings.HasSuffix(strings.ToLower(runType), strings.ToLower(*autostopLabel)))) {
 		if dryRun != "true" {
 			if _, err := cfClient.Applications.Stop(ctx, app.GUID); err != nil {
 				log.Printf("failed to stop app %s: %s", app.Name, err)
