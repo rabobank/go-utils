@@ -73,9 +73,13 @@ func main() {
 							mostRecentSnapshot = &snapshot
 						}
 					}
-					if mostRecentSnapshot.SnapshotCreateTime.Before(time.Now().Add(-time.Duration(thresholdDays)*24*time.Hour)) || *mostRecentSnapshot.Status != "available" {
-						//fmt.Printf("  Most recent SnapshotIdentifier: %s, SnapshotCreateTime: %s is too old\n", mostRecentSnapshotID, mostRecentSnapshotTime.Format(time.RFC3339))
-						createAlert(dbInstance)
+					if mostRecentSnapshot != nil {
+						if mostRecentSnapshot.SnapshotCreateTime.Before(time.Now().Add(-time.Duration(thresholdDays)*24*time.Hour)) || *mostRecentSnapshot.Status != "available" {
+							//fmt.Printf("  Most recent SnapshotIdentifier: %s, SnapshotCreateTime: %s is too old\n", mostRecentSnapshotID, mostRecentSnapshotTime.Format(time.RFC3339))
+							createAlert(dbInstance)
+						}
+					} else {
+						log.Printf("  No snapshots found for DB Instance: %s\n", *dbInstance.DBInstanceIdentifier)
 					}
 				}
 			}
