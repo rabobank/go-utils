@@ -13,6 +13,6 @@ A simple HTTP proxy server that forwards requests to a Nexus repository manager 
 * Start the proxy using the above environment variables.
 * cd to a test golang project directory, the one which we want to (test) build
 * set GOMODCACHE to a temp directory: `export GOMODCACHE=/tmp/gomodcache`
-* set GOPROXY to point to the proxy server: `export GOPROXY='http://localhost:4711/repository/golang/,direct'` (include the correct path for your nexus golang repository)
+* set GOPROXY to point to the proxy server: `export GOPROXY='http://localhost:4711/repository/golang/'` (include the correct path for your nexus golang repository)
 * run `go build .` or `go mod download` to test if the proxy is working correctly.
 * to repeat the test, make sure to clean the GOMODCACHE directory: `chmod -R 777 /tmp/gomodcache && rm -rf /tmp/gomodcache`
