@@ -107,14 +107,13 @@ func environmentComplete() bool {
 		fmt.Printf(" DRY_RUN: %t\n", dryRun)
 		fmt.Printf(" SERVICE_OFFERINGS: %s\n", serviceOfferings)
 		fmt.Printf(" GRACE_PERIOD: %s\n\n", graceDate.Format(time.RFC3339))
+		getCFClient()
 	}
-
-	cfClient = getCFClient()
 
 	return envComplete
 }
 
-func getCFClient() (cfClient *client.Client) {
+func getCFClient() {
 	var err error
 	if cfConfig, err = config.New(apiAddress, config.ClientCredentials(cfUsername, cfPassword), config.SkipTLSValidation()); err != nil {
 		log.Fatalf("failed to create new config: %s", err)
