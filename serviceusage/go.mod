@@ -1,4 +1,4 @@
-module github.com/rabobank/go-utils/serviceinstancecleaner
+module github.com/rabobank/go-utils/serviceusage
 
 go 1.26
 

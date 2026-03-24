@@ -52,10 +52,6 @@ func environmentComplete() bool {
 		fmt.Println("missing envvar : CF_PASSWORD")
 		envComplete = false
 	}
-	if cfPassword == "" {
-		fmt.Println("missing envvar : CF_PASSWORD")
-		envComplete = false
-	}
 	if skipSSLValidationStr == "" {
 		skipSSLValidation = false
 	} else {
