@@ -128,13 +128,15 @@ func main() {
 							if app, err := cfClient.Applications.Get(ctx, serviceBinding.Relationships.App.Data.GUID); err != nil {
 								log.Printf("failed to get app for guid %s: %s", serviceBinding.Relationships.App.Data.GUID, err)
 							} else {
-								if space, err := getSpaceByGuidCached(serviceInstance.Relationships.Space.Data.GUID); err != nil {
-									log.Printf("failed to get space for guid %s: %s", serviceInstance.Relationships.Space.Data.GUID, err)
-								} else {
-									if org, err := getOrgByGuidCached(space.Relationships.Organization.Data.GUID); err != nil {
-										log.Printf("failed to get org for guid %s: %s", space.Relationships.Organization.Data.GUID, err)
+								if app.State == "STARTED" {
+									if space, err := getSpaceByGuidCached(serviceInstance.Relationships.Space.Data.GUID); err != nil {
+										log.Printf("failed to get space for guid %s: %s", serviceInstance.Relationships.Space.Data.GUID, err)
 									} else {
-										fmt.Printf("%-15s %-60s %-20s %-20s %-30s %-40s %-40s\n", offeringNameByGuid(servicePlan.Relationships.ServiceOffering.Data.GUID), serviceInstance.Name, serviceInstance.UpdatedAt.Format(time.RFC3339), serviceInstance.LastOperation.UpdatedAt.Format(time.RFC3339), org.Name, space.Name, app.Name)
+										if org, err := getOrgByGuidCached(space.Relationships.Organization.Data.GUID); err != nil {
+											log.Printf("failed to get org for guid %s: %s", space.Relationships.Organization.Data.GUID, err)
+										} else {
+											fmt.Printf("%-15s %-60s %-20s %-20s %-30s %-40s %-40s\n", offeringNameByGuid(servicePlan.Relationships.ServiceOffering.Data.GUID), serviceInstance.Name, serviceInstance.UpdatedAt.Format(time.RFC3339), serviceInstance.LastOperation.UpdatedAt.Format(time.RFC3339), org.Name, space.Name, app.Name)
+										}
 									}
 								}
 							}
