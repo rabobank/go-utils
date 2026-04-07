@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/go-cfclient/v3/resource"
 	"log"
 	"os"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -98,6 +99,16 @@ func getCFClient() {
 	return
 }
 
+type outputRow struct {
+	offeringName    string
+	serviceInstance string
+	updatedAt       string
+	lastOperation   string
+	orgName         string
+	spaceName       string
+	appName         string
+}
+
 func main() {
 	if !environmentComplete() {
 		os.Exit(8)
@@ -106,7 +117,7 @@ func main() {
 	if servicePlans, err := cfClient.ServicePlans.ListAll(ctx, &servicePlanListOptions); err != nil {
 		log.Fatalf("failed to list service plans: %s", err)
 	} else {
-		fmt.Printf("%-15s %-60s %-20s %-20s %-30s %-40s %-40s\n", "Offering name", "Service Instance", "Updated At", "Last operation", "Org", "Space", "Bound App")
+		var rows []outputRow
 
 		for _, servicePlan := range servicePlans {
 			serviceInstanceListOptions := client.ServiceInstanceListOptions{
@@ -135,7 +146,15 @@ func main() {
 										if org, err := getOrgByGuidCached(space.Relationships.Organization.Data.GUID); err != nil {
 											log.Printf("failed to get org for guid %s: %s", space.Relationships.Organization.Data.GUID, err)
 										} else {
-											fmt.Printf("%-15s %-60s %-20s %-20s %-30s %-40s %-40s\n", offeringNameByGuid(servicePlan.Relationships.ServiceOffering.Data.GUID), serviceInstance.Name, serviceInstance.UpdatedAt.Format(time.RFC3339), serviceInstance.LastOperation.UpdatedAt.Format(time.RFC3339), org.Name, space.Name, app.Name)
+											rows = append(rows, outputRow{
+												offeringName:    offeringNameByGuid(servicePlan.Relationships.ServiceOffering.Data.GUID),
+												serviceInstance: serviceInstance.Name,
+												updatedAt:       serviceInstance.UpdatedAt.Format(time.RFC3339),
+												lastOperation:   serviceInstance.LastOperation.UpdatedAt.Format(time.RFC3339),
+												orgName:         org.Name,
+												spaceName:       space.Name,
+												appName:         app.Name,
+											})
 										}
 									}
 								}
@@ -144,6 +163,22 @@ func main() {
 					}
 				}
 			}
+		}
+
+		// Sort by org, then space, then app
+		sort.Slice(rows, func(i, j int) bool {
+			if rows[i].orgName != rows[j].orgName {
+				return rows[i].orgName < rows[j].orgName
+			}
+			if rows[i].spaceName != rows[j].spaceName {
+				return rows[i].spaceName < rows[j].spaceName
+			}
+			return rows[i].appName < rows[j].appName
+		})
+
+		fmt.Printf("%-15s %-60s %-20s %-20s %-30s %-40s %-40s\n", "Offering name", "Service Instance", "Updated At", "Last operation", "Org", "Space", "Bound App")
+		for _, row := range rows {
+			fmt.Printf("%-15s %-60s %-20s %-20s %-30s %-40s %-40s\n", row.offeringName, row.serviceInstance, row.updatedAt, row.lastOperation, row.orgName, row.spaceName, row.appName)
 		}
 	}
 }
