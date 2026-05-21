@@ -43,6 +43,6 @@ func (lrt *MyRoundTripper) RoundTrip(request *http.Request) (*http.Response, err
 		return nil, err
 	}
 	conf.RequestCounter++
-	log.Printf("%5d - %d : %s %s (%s)", conf.RequestCounter, response.StatusCode, request.Method, strings.Split(request.URL.String(), "?")[0], request.Host)
+	log.Printf("%5d - %d : %s %s", conf.RequestCounter, response.StatusCode, request.Method, strings.Split(request.URL.String(), "?")[0])
 	return response, err
 }
