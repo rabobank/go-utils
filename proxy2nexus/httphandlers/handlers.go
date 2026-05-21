@@ -3,11 +3,12 @@ package httphandlers
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/rabobank/proxy2nexus/conf"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/rabobank/proxy2nexus/conf"
 )
 
 func HandleRequest(req *http.Request) {
@@ -33,8 +34,10 @@ func (lrt *MyRoundTripper) RoundTrip(request *http.Request) (*http.Response, err
 	var response *http.Response
 	response, err = lrt.transport.RoundTrip(request)
 	if err != nil {
+		log.Printf("failed to proxy request %s: %s", request.URL.String(), err)
 		return nil, err
 	}
-	log.Printf("%d : %s %s (%s)", response.StatusCode, request.Method, strings.Split(request.URL.String(), "?")[0], request.Host)
+	conf.RequestCounter++
+	log.Printf("%5d - %d : %s %s (%s)", conf.RequestCounter, response.StatusCode, request.Method, strings.Split(request.URL.String(), "?")[0], request.Host)
 	return response, err
 }

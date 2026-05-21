@@ -12,11 +12,12 @@ const (
 )
 
 var (
-	HttpPort      int
-	err           error
-	ForwardTo     string
-	ProxyUser     string
-	ProxyPassword string
+	HttpPort       int
+	err            error
+	ForwardTo      string
+	ProxyUser      string
+	ProxyPassword  string
+	RequestCounter int
 )
 
 func InitConfig() {
