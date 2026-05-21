@@ -36,10 +36,7 @@ func (lrt *MyRoundTripper) RoundTrip(request *http.Request) (*http.Response, err
 	response, err = lrt.transport.RoundTrip(request)
 	endTime := time.Now()
 	if err != nil {
-		if request.Context() != nil {
-			log.Printf("failed to proxy request %s, context: %s", request.URL.String(), request.Context().Err())
-		}
-		log.Printf("failed to proxy request (duration %d ms) %s: %s", endTime.UnixMilli()-startTime.UnixMilli(), request.URL.String(), err)
+		log.Printf("failed to proxy request (duration %d ms) %s %s: %s", endTime.UnixMilli()-startTime.UnixMilli(), request.Method, request.URL.String(), err)
 		return nil, err
 	}
 	conf.RequestCounter++
