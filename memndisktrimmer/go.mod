@@ -1,10 +1,10 @@
 module github.com/rabobank/go-utils/memndisktrimmer
 
-go 1.25
+go 1.26
 
 replace github.com/stretchr/testify => github.com/stretchr/testify v1.11.1
 
-require github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.15
+require github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.20
 
 require (
 	github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 // indirect
@@ -14,6 +14,6 @@ require (
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
-	golang.org/x/oauth2 v0.32.0 // indirect
+	golang.org/x/oauth2 v0.36.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

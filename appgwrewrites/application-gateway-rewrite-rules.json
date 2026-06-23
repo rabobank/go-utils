@@ -1,0 +1,342 @@
+[
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "X-Client-Cert",
+          "headerValue": ""
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [],
+    "name": "rule-100",
+    "ruleSequence": 100
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "payment-request-merchant-site-v2-uat.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "payment-request-ideal-api-dev.rabobank.nl",
+        "variable": "http_req_Host"
+      }
+    ],
+    "name": "rule-110",
+    "ruleSequence": 110
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "payment-request-merchant-site-v2.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "payment-request-wero-api-int.rabobank.nl",
+        "variable": "http_req_Host"
+      }
+    ],
+    "name": "rule-112",
+    "ruleSequence": 112
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "wero-push-notification-service-int.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "wero-test-api.rabobank.nl",
+        "variable": "http_req_Host"
+      },
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "/api/notifications.*",
+        "variable": "var_uri_path"
+      }
+    ],
+    "name": "rule-120",
+    "ruleSequence": 120
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "wero-consumer-management-service.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "wero-test-api.rabobank.nl",
+        "variable": "http_req_Host"
+      },
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "/(api|pub)/epi-data-change-events/.*",
+        "variable": "var_uri_path"
+      }
+    ],
+    "name": "rule-130",
+    "ruleSequence": 130
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "wero-wac-int.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "wero-test-api.rabobank.nl",
+        "variable": "http_req_Host"
+      },
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "/api/authorisations/.*",
+        "variable": "var_uri_path"
+      }
+    ],
+    "name": "rule-140",
+    "ruleSequence": 140
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "wero-wac-int.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "wero-test-api.rabobank.nl",
+        "variable": "http_req_Host"
+      },
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "/api/captures/.*",
+        "variable": "var_uri_path"
+      }
+    ],
+    "name": "rule-150",
+    "ruleSequence": 150
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "wero-wac-uat.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "wero-uat-api.rabobank.nl",
+        "variable": "http_req_Host"
+      },
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "/api/authorisations/.*",
+        "variable": "var_uri_path"
+      }
+    ],
+    "name": "rule-160",
+    "ruleSequence": 160
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "wero-wac-uat.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "wero-uat-api.rabobank.nl",
+        "variable": "http_req_Host"
+      },
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "/api/captures/.*",
+        "variable": "var_uri_path"
+      }
+    ],
+    "name": "rule-170",
+    "ruleSequence": 170
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "wero-push-notification-service-uat.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "wero-uat-api.rabobank.nl",
+        "variable": "http_req_Host"
+      },
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "/api/notifications.*",
+        "variable": "var_uri_path"
+      }
+    ],
+    "name": "rule-180",
+    "ruleSequence": 180
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "wero-consumer-management-uat.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "wero-uat-api.rabobank.nl",
+        "variable": "http_req_Host"
+      },
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "/api/epi-data-change-events.*",
+        "variable": "var_uri_path"
+      }
+    ],
+    "name": "rule-190",
+    "ruleSequence": 190
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "wero-consumer-management-int.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "wero-test-api.rabobank.nl",
+        "variable": "http_req_Host"
+      },
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "/api/epi-data-change-events.*",
+        "variable": "var_uri_path"
+      }
+    ],
+    "name": "rule-200",
+    "ruleSequence": 200
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "Host",
+          "headerValue": "wero-consumer-management-uat.apps.cfd06.rabobank.nl"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "wero-uat-api.rabobank.nl",
+        "variable": "http_req_Host"
+      },
+      {
+        "ignoreCase": true,
+        "negate": false,
+        "pattern": "/api/epi-data-change-events/.*",
+        "variable": "var_uri_path"
+      }
+    ],
+    "name": "rule-210",
+    "ruleSequence": 210
+  },
+  {
+    "actionSet": {
+      "requestHeaderConfigurations": [
+        {
+          "headerName": "X-Client-Cert",
+          "headerValue": "{var_client_certificate}"
+        }
+      ],
+      "responseHeaderConfigurations": []
+    },
+    "conditions": [],
+    "name": "rule-500",
+    "ruleSequence": 500
+  }
+]
