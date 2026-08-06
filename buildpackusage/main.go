@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/cloudfoundry/go-cfclient/v3/client"
-	"github.com/cloudfoundry/go-cfclient/v3/config"
-	"github.com/cloudfoundry/go-cfclient/v3/resource"
 	"log"
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/cloudfoundry/go-cfclient/v3/client"
+	"github.com/cloudfoundry/go-cfclient/v3/config"
+	"github.com/cloudfoundry/go-cfclient/v3/resource"
 )
 
 var (
@@ -85,6 +86,7 @@ func main() {
 	}
 
 	buildpackVersions := make(map[string]int) // key is buildpack name and version, value is count of droplets using that buildpack
+	buildpackNames := make(map[string]int)    // key is buildpack name, value is count of droplets using that buildpack
 
 	dropletListOptions := client.DropletListOptions{ListOptions: &client.ListOptions{}}
 	if droplets, err := cfClient.Droplets.ListAll(ctx, &dropletListOptions); err != nil {
@@ -98,20 +100,23 @@ func main() {
 					if strings.Contains(buildpack.Version, "-offline-") {
 						buildpack.Version = strings.Split(buildpack.Version, "-offline-")[0]
 					}
-					if currentVersion := buildpackVersions[buildpack.Name+"/"+buildpack.Version]; currentVersion == 0 {
-						buildpackVersions[buildpack.Name+"/"+buildpack.Version] = 1
-					} else {
-						buildpackVersions[buildpack.Name+"/"+buildpack.Version] = currentVersion + 1
-					}
+					buildpackVersions[buildpack.Name+"/"+buildpack.Version]++
+					buildpackNames[buildpack.Name]++
 				}
 			}
 
 		}
-		fmt.Printf("Total buildpack droplets: %d\n", dropletCount)
-		// range over the buildpackVersions map and print out the buildpacks and their counts
+		fmt.Printf("Buildpack droplets (total / unique versions): %d / %d\n\n", dropletCount, len(buildpackVersions))
+
+		// Print counts by buildpack name
+		fmt.Println("=== Counts by Buildpack Name ===")
+		for name, count := range buildpackNames {
+			fmt.Printf("%s: %d\n", name, count)
+		}
+
+		fmt.Println("\n=== Counts by Buildpack Name/Version ===")
 		for buildpack, count := range buildpackVersions {
 			fmt.Printf("%s: %d\n", buildpack, count)
 		}
 	}
-
 }
