@@ -63,7 +63,7 @@ func main() {
 	go func() {
 		for {
 			if accessToken, err = uaa.GetAuthToken(conf.Client, conf.Secret, true); err != nil {
-				log.Fatalf("tokenRefresher failed : %s)", err)
+				log.Fatalf("tokenRefresher failed : %s", err)
 			}
 			tokenAttacher.refreshToken(accessToken)
 			time.Sleep(15 * time.Minute)

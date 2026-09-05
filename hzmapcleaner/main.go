@@ -106,7 +106,7 @@ func main() {
 			}
 		}
 		if errCount > 0 {
-			fmt.Printf("encountered %d errors, exiting with non-zero exitcode\n", errCount)
+			fmt.Printf("encountered %d errors, exiting with non-zero exit code\n", errCount)
 			os.Exit(1)
 		}
 		if err = client.Shutdown(ctx); err != nil {

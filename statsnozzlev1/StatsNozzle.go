@@ -37,7 +37,7 @@ type tokenRefresher struct {
 func (t *tokenRefresher) RefreshAuthToken() (string, error) {
 	token, err := t.uaaClient.GetAuthToken(conf.CfUsername, conf.CfPassword, true)
 	if err != nil {
-		log.Fatalf("tokenRefresher failed : %s)", err)
+		log.Fatalf("tokenRefresher failed : %s", err)
 	}
 	return token, nil
 }
