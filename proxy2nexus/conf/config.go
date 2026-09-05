@@ -39,7 +39,7 @@ func InitConfig() {
 	}
 
 	if strings.HasPrefix(ForwardTo, "http") {
-		log.Fatalf("FORWARD_TO_HOST environment variable %s should not contain http/https prefix", ForwardTo)
+		log.Fatalf("FORWARD_TO_HOST environment variable %s should not contain an http/https prefix", ForwardTo)
 	}
 	ProxyUser = os.Getenv("PROXY_USER")
 	ProxyPassword = os.Getenv("PROXY_PASSWORD")
