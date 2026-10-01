@@ -139,6 +139,14 @@ func collectBuildpackRows(cfClient *client.Client) ([]buildpackRow, map[string]i
 	if err != nil {
 		log.Fatalf("failed to list apps: %s", err)
 	}
+	droplets, err := cfClient.Droplets.ListAll(ctx, &client.DropletListOptions{ListOptions: &client.ListOptions{PerPage: 5000}})
+	if err != nil {
+		log.Fatalf("failed to list droplets: %s", err)
+	}
+	dropletByGUID := make(map[string]*resource.Droplet, len(droplets))
+	for _, droplet := range droplets {
+		dropletByGUID[droplet.GUID] = droplet
+	}
 
 	rows := make([]buildpackRow, 0, len(apps))
 	byName := map[string]int64{}
@@ -151,16 +159,12 @@ func collectBuildpackRows(cfClient *client.Client) ([]buildpackRow, map[string]i
 			currentDropletGUID = app.Relationships.CurrentDroplet.Data.GUID
 		}
 		if currentDropletGUID == "" {
-			currentDroplet, err := cfClient.Droplets.GetCurrentForApp(ctx, app.GUID)
-			if err != nil {
-				continue
-			}
-			currentDropletGUID = currentDroplet.GUID
+			continue
 		}
 
-		droplet, err := cfClient.Droplets.Get(ctx, currentDropletGUID)
-		if err != nil {
-			log.Printf("failed to get droplet %s for app %s: %s", currentDropletGUID, app.Name, err)
+		droplet, ok := dropletByGUID[currentDropletGUID]
+		if !ok {
+			log.Printf("failed to find droplet %s for app %s", currentDropletGUID, app.Name)
 			continue
 		}
 		if len(droplet.Buildpacks) == 0 {
