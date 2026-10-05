@@ -139,10 +139,12 @@ func collectBuildpackRows(cfClient *client.Client) ([]buildpackRow, map[string]i
 	if err != nil {
 		log.Fatalf("failed to list apps: %s", err)
 	}
+	fmt.Printf("Found %d apps\n", len(apps))
 	droplets, err := cfClient.Droplets.ListAll(ctx, &client.DropletListOptions{ListOptions: &client.ListOptions{PerPage: 5000}})
 	if err != nil {
 		log.Fatalf("failed to list droplets: %s", err)
 	}
+	fmt.Printf("Found %d droplets\n", len(droplets))
 	dropletByGUID := make(map[string]*resource.Droplet, len(droplets))
 	for _, droplet := range droplets {
 		dropletByGUID[droplet.GUID] = droplet
