@@ -2,6 +2,8 @@ module github.com/rabobank/go-utils/buildpackusage
 
 go 1.26.0
 
+replace golang.org/x/mod => golang.org/x/mod v0.41.0
+
 require (
 	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-beta.1
 	modernc.org/sqlite v1.60.1
