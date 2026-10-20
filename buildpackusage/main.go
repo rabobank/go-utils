@@ -38,7 +38,8 @@ type buildpackRow struct {
 	DateLastUpdated  time.Time
 	BuildpackName    string
 	BuildpackVersion string
-	Stack            string
+	StackDroplet     string
+	StackApp         string
 }
 
 type buildpackNameStack struct {
@@ -184,6 +185,22 @@ func collectBuildpackRows(cfClient *client.Client) ([]buildpackRow, map[string]i
 			if strings.TrimSpace(buildpackName) == "" {
 				buildpackName = detectedBuildpack.Name
 			}
+
+			appStack := ""
+
+			switch v := app.Lifecycle.Data.(type) {
+			case *resource.BuildpackLifecycle:
+				appStack = v.Stack
+			case *resource.CNBLifecycle:
+				appStack = v.Stack
+			case *resource.DockerLifecycle:
+				// Docker lifecycle has no Stack field
+			case nil:
+				// no data
+			default:
+				// unexpected lifecycle data type
+			}
+
 			row := buildpackRow{
 				OrgName:          org.Name,
 				SpaceName:        space.Name,
@@ -192,7 +209,8 @@ func collectBuildpackRows(cfClient *client.Client) ([]buildpackRow, map[string]i
 				DateLastUpdated:  droplet.UpdatedAt,
 				BuildpackName:    buildpackName,
 				BuildpackVersion: detectedBuildpack.Version,
-				Stack:            droplet.Stack,
+				StackDroplet:     droplet.Stack,
+				StackApp:         appStack,
 			}
 			rows = append(rows, row)
 			byName[buildpackName]++
@@ -257,7 +275,8 @@ func toDBRows(rows []buildpackRow) []db.DropletBuildpack {
 			DateLastUpdated:  row.DateLastUpdated,
 			BuildpackName:    row.BuildpackName,
 			BuildpackVersion: row.BuildpackVersion,
-			Stack:            row.Stack,
+			StackDroplet:     row.StackDroplet,
+			StackApp:         row.StackApp,
 		})
 	}
 	return dbRows
