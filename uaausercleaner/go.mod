@@ -3,7 +3,7 @@ module github.com/rabobank/go-utils/uaausercleaner
 go 1.26.0
 
 replace (
-	golang.org/x/net => golang.org/x/net v0.61.0
+	golang.org/x/net => golang.org/x/net v0.62.0
 	golang.org/x/text => golang.org/x/text v0.43.0
 )
 
@@ -11,7 +11,7 @@ require github.com/cloudfoundry-community/go-uaa v0.5.1
 
 require (
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/net v0.61.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/oauth2 v0.37.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 )
